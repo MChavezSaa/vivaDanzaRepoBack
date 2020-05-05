@@ -58,13 +58,10 @@ public class FotoController {
     /*ver foto*/
     @GetMapping("uploads/{nombreFoto:.+}")
     public ResponseEntity<Resource> verFoto(@PathVariable String nombreFoto) {
-        System.out.println(nombreFoto);
         Path rutaArchivo = Paths.get("Uploads").resolve(nombreFoto).toAbsolutePath();
-        System.out.println(rutaArchivo.toString());
         Resource recurso = null;
         try {
             recurso = new UrlResource(rutaArchivo.toUri());
-            System.out.println(recurso.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -109,7 +106,6 @@ public class FotoController {
 
     @DeleteMapping("/deleteFoto/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-//arreglar esta funcion!
         Map<String, Object> response = new HashMap<String, Object>();
         try {
             Foto fotoAEliminar = fotoServiceIMPL.findbyId(id);
@@ -127,7 +123,6 @@ public class FotoController {
 
         response.put("mensaje", "La foto fue eliminada con éxito!");
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-
     }
 
 }
