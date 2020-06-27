@@ -26,6 +26,7 @@ public class FuncionarioServiceImpl implements IFuncionarioService {
     }
 
     @Transactional
+    @Override
     public Optional<Funcionario> findOne(long id) {
         return funcionarioDao.findById(id);
     }
@@ -41,6 +42,11 @@ public class FuncionarioServiceImpl implements IFuncionarioService {
         Funcionario funcBuscado = funcionarioDao.findById(id).get();
         funcBuscado.setEstado_funcionario(false);
         funcionarioDao.save(funcBuscado);
+    }
+
+    @Override
+    public Funcionario findByRut(String rut) {
+        return funcionarioDao.findByRut(rut);
     }
 
 }

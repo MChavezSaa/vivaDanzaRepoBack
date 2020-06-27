@@ -15,6 +15,7 @@ public class Funcionario {
     private String Nombres;
     private String Apellidos;
     private String Cargo;
+    private String rut;
     private String leyenda;
     private boolean estado_funcionario;
     private String foto;

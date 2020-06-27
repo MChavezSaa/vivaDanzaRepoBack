@@ -11,5 +11,6 @@ public interface IFuncionarioService {
     Optional<Funcionario> findOne(long id);
     void delete(Funcionario funcionario);
     void deletebyID(long id);
+    Funcionario findByRut(String rut);
 
 }

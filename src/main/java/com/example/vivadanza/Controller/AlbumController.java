@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,13 +22,14 @@ public class AlbumController {
     @Autowired
     private AlbumServiceIMPL albumServiceIMPL;
 
-    //    @Secured({"ROLE_ADMIN","ROLE_CLIENT"})
+
     @RequestMapping(value = "/ListAlbumes", method = RequestMethod.GET)
     public List<Album> findAll() {
         List<Album> all = albumServiceIMPL.findAll();
         return all;
     }
 
+    @Secured({"ROLE_ADMIN","ROLE_EMP"})
     @PostMapping(value = "/saveAlbum")
     @ResponseStatus(value = CREATED)
     public ResponseEntity<?> create(@RequestBody Album album) {
@@ -51,7 +53,7 @@ public class AlbumController {
         return new ResponseEntity<Map<String, Object>>(response, OK);
     }
 
-    //@Secured({"ROLE_ADMIN","ROLE_CLIENT"})
+    @Secured({"ROLE_ADMIN","ROLE_EMP"})
     @GetMapping("/AlbumID/{id}")
     public ResponseEntity<?> findOne(@PathVariable Long id) {
         Album al = null;
@@ -73,7 +75,7 @@ public class AlbumController {
         return new ResponseEntity(al, HttpStatus.OK);
     }
 
-    //@Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN"})
     @PutMapping(value = "/updateAlbum/{id}")
     public ResponseEntity<?> update(@RequestBody Album album, @PathVariable Long id) {
         Album album1 = albumServiceIMPL.findOne(id).get();

@@ -26,8 +26,7 @@ public class CarouselServiceIMPL  implements ICarouselService {
 
     @Transactional
     public void delete(Carousel carousel) {
-        carousel.setEstado(false);
-        carouselDao.save(carousel);
+        carouselDao.delete(carousel);
     }
 
     @Transactional

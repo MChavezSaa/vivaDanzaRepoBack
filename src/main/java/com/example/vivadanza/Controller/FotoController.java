@@ -10,6 +10,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -36,13 +37,14 @@ public class FotoController {
     @Autowired
     private AlbumServiceIMPL albumServiceIMPL;
 
-    //    @Secured({"ROLE_ADMIN","ROLE_CLIENT"})
+
     @RequestMapping(value = "/ListFotos", method = RequestMethod.GET)
     public List<Foto> findAll() {
         List<Foto> all = fotoServiceIMPL.findAll();
         return all;
     }
 
+    @Secured({"ROLE_ADMIN","ROLE_EMP"})
     @RequestMapping(value = "/fotosPorAlbum/{id}", method = RequestMethod.GET)
     public List<Foto> findFotosPorAlbum(@PathVariable Long id) {
         List<Foto> all = fotoServiceIMPL.findAll();
@@ -74,7 +76,7 @@ public class FotoController {
     }
 
     /*subir foto*/
-    //@Secured({"ROLE_ADMIN","ROLE_ESTETI"})
+    @Secured({"ROLE_ADMIN","ROLE_EMP"})
     @PostMapping(value = "/saveimagen")
     public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id) {
         System.out.println(archivo.getOriginalFilename());
@@ -104,6 +106,7 @@ public class FotoController {
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
     }
 
+    @Secured({"ROLE_ADMIN","ROLE_EMP"})
     @DeleteMapping("/deleteFoto/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<String, Object>();
