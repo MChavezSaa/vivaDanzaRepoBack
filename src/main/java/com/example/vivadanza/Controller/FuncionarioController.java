@@ -148,17 +148,19 @@ public class FuncionarioController {
 
     }
 
-    @Secured({"ROLE_ADMIN","ROLE_EMP"})
-    @RequestMapping(value = "/darAltaFunc/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<?> darAlta(@PathVariable Long id) {
+    @Secured("ROLE_ADMIN")
+    @PutMapping(value = "/darAlta/{id}")
+    public ResponseEntity<?> darAlta1(@RequestBody Funcionario funcionario, @PathVariable Long id) {
         Funcionario funcionarioActual = funcionarioService.findOne(id).get();
         funcionarioActual.setEstado_funcionario(true);
         Funcionario funcionarioUpdated = null;
+
         rolesList=null;
         rolesList=  roleService.findAll();
         Usuario user = new Usuario();
 
         Map<String, Object> response = new HashMap<String, Object>();
+
         if (funcionarioActual == null) {
             response.put("mensaje", "No se pudo dar de alta, el funcionario con el ID: ".concat(id.toString()
                     .concat(" no existe en la base de datos")));
@@ -182,8 +184,6 @@ public class FuncionarioController {
                 usuarioService.saveUsuario_Roles(user.getId_Usuario(),
                         rolesList.get(1).getId_Role());
             }
-
-
 
         } catch (DataAccessException e) {
             response.put("mensaje", "Error al dar de alta el funcionario en la base de datos");
