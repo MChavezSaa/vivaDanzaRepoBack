@@ -198,6 +198,37 @@ public class FuncionarioController {
 
     }
 
+    @Secured({"ROLE_ADMIN","ROLE_EMP"})
+    @PutMapping(value = "/updateLeyenda/{id}")
+    @ResponseStatus(value = CREATED)
+    public ResponseEntity<?> updateLeyenda(@RequestBody Funcionario funcionario , @PathVariable Long id){
+        Funcionario funcionarioActual = funcionarioService.findOne(id).get();
+        Funcionario funcionarioUpdated = null;
+
+        Map<String, Object> response = new HashMap<String, Object>();
+
+        if (funcionarioActual == null) {
+            response.put("mensaje", "No se pudo editar, el funcionario con el ID: ".concat(id.toString().concat(" no existe en la base de datos")));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+        }
+        try {
+            funcionarioActual.setLeyenda(funcionario.getLeyenda());
+
+            funcionarioUpdated = funcionarioService.save(funcionarioActual);
+
+        } catch (DataAccessException e) {
+            response.put("mensaje", "Error al actualizar la leyenda");
+            response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        response.put("mensaje", "Leyenda actualizada con éxito!");
+        response.put("funcionario", funcionarioUpdated);
+
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+
+    }
+
 
     /*subir foto*/
     @Secured({"ROLE_ADMIN","ROLE_EMP"})
