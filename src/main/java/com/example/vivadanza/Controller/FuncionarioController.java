@@ -86,7 +86,7 @@ public class FuncionarioController {
     @Secured({"ROLE_ADMIN","ROLE_EMP"})
     @PutMapping(value = "/updateFuncionario/{id}")
     @ResponseStatus(value = CREATED)
-    public ResponseEntity<?> update(@RequestBody Funcionario funcionario , @PathVariable Long id){
+    public ResponseEntity<?> update(@RequestBody Funcionario funcionarioParams , @PathVariable Long id){
         Funcionario funcionarioActual = funcionarioService.findOne(id).get();
         Funcionario funcionarioUpdated = null;
 
@@ -97,10 +97,8 @@ public class FuncionarioController {
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
         }
         try {
-            funcionarioActual.setRut(funcionario.getRut());
-            funcionarioActual.setNombres(funcionario.getNombres());
-            funcionarioActual.setApellidos(funcionario.getApellidos());
-            funcionarioActual.setCargo(funcionario.getCargo());
+            verificarRut(funcionarioActual, funcionarioParams);
+            verificarCargo(funcionarioActual, funcionarioParams);
 
 
             funcionarioUpdated = funcionarioService.save(funcionarioActual);
@@ -116,6 +114,106 @@ public class FuncionarioController {
 
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 
+    }
+
+    private void verificarCargo(Funcionario funcionarioActual, Funcionario funcionario) {
+        rolesList = roleService.findAll();
+        System.out.println(funcionarioActual.toString());
+        System.out.println("------------------------");
+        System.out.println(funcionario.toString());
+        System.out.println("------------------------");
+        if(!(funcionarioActual.getCargo().equalsIgnoreCase(funcionario.getCargo())) ){
+            System.out.println("Cargos Distintos");
+            Usuario userOld = usuarioService.findByUsername(funcionarioActual.getRut());
+            Usuario userNew = new Usuario();
+            userNew.setNombre(userOld.getNombre());
+            userNew.setEnable(userOld.isEnable());
+            userNew.setPassword(userOld.getPassword());
+            userNew.setUsername(userOld.getUsername());
+
+            if (funcionario.getCargo().equalsIgnoreCase("Administrativo")){
+                //eliminamos el usuario anterior
+                usuarioService.deleteById(userOld.getId_Usuario());
+                //guardamos nuevo usuario (clon del anterior)
+                usuarioService.save(userNew);
+                //guardamos nuevo usuario_Roles
+                Usuario userAux = usuarioService.findByUsername(userNew.getUsername());
+                usuarioService.saveUsuario_Roles(userAux.getId_Usuario(),
+                        rolesList.get(0).getId_Role());
+                funcionarioActual.setCargo(funcionario.getCargo());
+                funcionarioService.save(funcionarioActual);
+            }
+            else{
+
+                //eliminamos el usuario anterior
+                usuarioService.deleteById(userOld.getId_Usuario());
+                //guardamos nuevo usuario (clon del anterior)
+                usuarioService.save(userNew);
+                //guardamos nuevo usuario_Roles
+                Usuario userAux = usuarioService.findByUsername(userNew.getUsername());
+                usuarioService.saveUsuario_Roles(userAux.getId_Usuario(),
+                        rolesList.get(1).getId_Role());
+                funcionarioActual.setCargo(funcionario.getCargo());
+                funcionarioService.save(funcionarioActual);
+
+            }
+        }
+
+   /*
+   *      if(!(funcionarioActual.getCargo().equalsIgnoreCase(funcionario.getCargo()))){
+            System.out.println("entre en cargo distintos");
+
+
+            userAux.setUsername(userOld.getUsername());
+            userAux.setPassword(userOld.getPassword());
+            userAux.setNombre(userOld.getNombre());
+            userAux.setEnable(userOld.isEnable());
+            if()){
+                funcionarioActual.setNombres(funcionario.getNombres());
+                funcionarioActual.setApellidos(funcionario.getApellidos());
+
+                funcionarioActual.setRut(funcionario.getRut());
+
+                usuarioService.deleteById(userOld.getId_Usuario());
+                usuarioService.save(userAux);
+                usuarioService.saveUsuario_Roles(userAux.getId_Usuario(),
+                        rolesList.get(0).getId_Role());
+            }else{
+                funcionarioActual.setNombres(funcionario.getNombres());
+                funcionarioActual.setApellidos(funcionario.getApellidos());
+                funcionarioActual.setCargo(funcionario.getCargo());
+                funcionarioActual.setRut(funcionario.getRut());
+
+                usuarioService.deleteById(userOld.getId_Usuario());
+                usuarioService.save(userAux);
+                usuarioService.saveUsuario_Roles(userAux.getId_Usuario(),
+                        rolesList.get(1).getId_Role());
+            }
+
+            funcionarioService.save(funcionarioActual);
+
+
+        }
+        else{
+            System.out.println("entre en cargos iguales");
+            funcionarioActual.setNombres(funcionario.getNombres());
+            funcionarioActual.setApellidos(funcionario.getApellidos());
+            funcionarioActual.setRut(funcionario.getRut());
+            funcionarioService.save(funcionarioActual);
+        }*/
+
+    }
+
+    private void verificarRut(Funcionario funcionarioActual, Funcionario funcionario) {
+        if(funcionarioActual.getRut() != funcionario.getRut()){
+            Usuario user = usuarioService.findByUsername(funcionarioActual.getRut());
+            user.setUsername(funcionario.getRut());
+            usuarioService.save(user);
+            funcionarioActual.setRut(funcionario.getRut());
+            funcionarioActual.setNombres(funcionario.getNombres());
+            funcionarioActual.setApellidos(funcionario.getApellidos());
+            funcionarioService.save(funcionarioActual);
+        }
     }
 
     @Secured("ROLE_ADMIN")
